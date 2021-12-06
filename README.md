@@ -76,7 +76,7 @@ Combine pdf files and delete pages from a pdf pyPDF ghostscript.  Keywords: sas 
         x "gswin64c &lonLyn";
         x "cd c:/utl"; * this is my pwd;
 
-        COMBINE ALL PDS IN A DIRECTORY
+        COMBINE ALL PDFs IN A DIRECTORY
 
         %utlfkil(d:/pdf/irisGnpCombineGs.pdf); * just in case it exists;
         x "cd c:/pdf";
