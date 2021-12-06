@@ -9,8 +9,9 @@ https://github.com/rogerjdeangelis/utl_combine_pdf_files_and_delete_pages_from_a
 Need this to handle PDFs
 Get ghostscript here (note ghostscript can combine PDF files and can convert PDF to TIF.
 http://www.ghostscript.com/download/gsdnld.html
-Really only need one executable.
-https://www.dropbox.com/s/g153vhv3rgb3ywi/gswin64c.exe?dl=0
+
+Unzip and copy files to the pdf directory
+https://www.dropbox.com/s/g153vhv3rgb3ywi/gswin64z.exe?dl=0
 
 Nothing needed for pyPDF2 is in base Python
 
