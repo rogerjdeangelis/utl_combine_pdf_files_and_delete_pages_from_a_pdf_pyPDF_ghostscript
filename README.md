@@ -145,84 +145,70 @@ Combine pdf files and delete pages from a pdf pyPDF ghostscript.  Keywords: sas 
 
     * use the commd line for ghostscript;
 
-    %macro pypdf(
-        inp1    =d:/pdf/irisGnp.pdf
-       ,inp2    =N
-       ,out     =
-       ,action  =
-       ) / des="combine or remove pages from a pdfs";
-
-       %if "&inp2" eq "N" %then %do;
-           data _null_;
-              length action rng $512;
-              retain action "&action" ;
-              act=substr(action,anydigit(action));
-              do i=1 to countw(compbl(act),' ');
-                 actcut=scan(act,i,' ');
-                 do j=input(scan(actcut,1,':'),3.) to input(scan(actcut,2,':'),3.);
-                    rng=catx(',',rng,put(j-1,3.));
-                 end;
-              end;
-              put rng=;
-              call symputx('rng',rng);
-              if scan(upcase(left(action)),1,' ')="DELETE" then call symputx("logi","not");
-              else call symputx("logi","  ");
-              stop;
-           run;quit;
-
-           * in works;
-           %utl_submit_wps64("
-           options set=PYTHONHOME 'C:\Progra~1\Python~1.5\';
-           options set=PYTHONPATH 'C:\Progra~1\Python~1.5\\lib\';
-           libname sd1 'd:/sd1';
-           proc python;
-           submit;
-           import itertools;
-           from PyPDF2 import PdfFileWriter, PdfFileReader, PageRange;
-           pages_to_keep = [&rng.];
-           infile = PdfFileReader('d:/pdf/irisGnp.pdf', 'rb');
-           output = PdfFileWriter();
-           for i in range(infile.getNumPages()):;
-           .   if i &logi in pages_to_keep:;
-           .       p = infile.getPage(i);
-           .       output.addPage(p);
-           with open('&out', 'wb') as f:;
-           .   output.write(f);
-           endsubmit;
-           run;quit;
-           ");
-
-       %end;
-       %else %do;
-           %utl_submit_wps64("
-           options set=PYTHONHOME 'C:\Progra~1\Python~1.5\';
-           options set=PYTHONPATH 'C:\Progra~1\Python~1.5\\lib\';
-           libname sd1 'd:/sd1';
-           proc python;
-           submit;
-           import PyPDF2;
-           pdf1File = open('&inp1.', 'rb');
-           pdf2File = open('&inp2', 'rb');
-           pdf1Reader = PyPDF2.PdfFileReader(pdf1File);
-           pdf2Reader = PyPDF2.PdfFileReader(pdf2File);
-           pdfWriter = PyPDF2.PdfFileWriter();
-           for pageNum in range(pdf1Reader.numPages):;
-           .    pageObj = pdf1Reader.getPage(pageNum);
-           .    pdfWriter.addPage(pageObj);
-           for pageNum in range(pdf2Reader.numPages):;
-           .    pageObj = pdf2Reader.getPage(pageNum);
-           .    pdfWriter.addPage(pageObj);
-           pdfOutputFile = open('&out', 'wb');
-           pdfWriter.write(pdfOutputFile);
-           pdfOutputFile.close();
-           pdf1File.close();
-           pdf2File.close();
-           endsubmit;
-           run;quit;
-           ");
-       %end;
-
-    %mend pypdf;
+    %macro pypdf(                                                                                     
+        inp1    =h:/pls/list.pdf                                                                      
+       ,inp2    =N                                                                                    
+       ,out     =                                                                                     
+       ,action  =                                                                                     
+       ) / des="combine remove extract pages from a pdfs";                                            
+                                                                                                      
+       %if "&inp2" eq "N" %then %do;                                                                  
+           data _null_;                                                                               
+              length action rng $512;                                                                 
+              retain action "&action" ;                                                               
+              act=substr(action,anydigit(action));                                                    
+              do i=1 to countw(compbl(act),' ');                                                      
+                 actcut=scan(act,i,' ');                                                              
+                 do j=input(scan(actcut,1,':'),3.) to input(scan(actcut,2,':'),3.);                   
+                    rng=catx(',',rng,put(j-1,3.));                                                    
+                 end;                                                                                 
+              end;                                                                                    
+              put rng=;                                                                               
+              call symputx('rng',rng);                                                                
+              if scan(upcase(left(action)),1,' ')="DELETE" then call symputx("logi","not");           
+              else call symputx("logi","  ");                                                         
+              stop;                                                                                   
+           run;quit;                                                                                  
+                                                                                                      
+           * in works;                                                                                
+           %utl_submit_py64("                                                                         
+           import itertools;                                                                          
+           from PyPDF2 import PdfFileWriter, PdfFileReader, PageRange;                                
+           pages_to_keep = [&rng.];                                                                   
+           infile = PdfFileReader('&inp1', 'rb');                                                     
+           output = PdfFileWriter();                                                                  
+           for i in range(infile.getNumPages()):;                                                     
+           .   if i &logi in pages_to_keep:;                                                          
+           .       p = infile.getPage(i);                                                             
+           .       output.addPage(p);                                                                 
+           with open('&out', 'wb') as f:;                                                             
+           .   output.write(f);                                                                       
+           ");                                                                                        
+                                                                                                      
+       %end;                                                                                          
+       %else %do;                                                                                     
+           %utl_submit_py64("                                                                         
+           import PyPDF2;                                                                             
+           pdf1File = open('&inp1.', 'rb');                                                           
+           pdf2File = open('&inp2', 'rb');                                                            
+           pdf1Reader = PyPDF2.PdfFileReader(pdf1File);                                               
+           pdf2Reader = PyPDF2.PdfFileReader(pdf2File);                                               
+           pdfWriter = PyPDF2.PdfFileWriter();                                                        
+           for pageNum in range(pdf1Reader.numPages):;                                                
+           .    pageObj = pdf1Reader.getPage(pageNum);                                                
+           .    pdfWriter.addPage(pageObj);                                                           
+           for pageNum in range(pdf2Reader.numPages):;                                                
+           .    pageObj = pdf2Reader.getPage(pageNum);                                                
+           .    pdfWriter.addPage(pageObj);                                                           
+           pdfOutputFile = open('&out', 'wb');                                                        
+           pdfWriter.write(pdfOutputFile);                                                            
+           pdfOutputFile.close();                                                                     
+           pdf1File.close();                                                                          
+           pdf2File.close();                                                                          
+           ");                                                                                        
+       %end;                                                                                          
+                                                                                                      
+    %mend pypdf;                                                                                      
 
     * pyPDF;
 
